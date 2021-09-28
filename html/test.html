@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+
+<div id="layaContainer">
+    <canvas id="layaCanvas" width="1346" height="713" style="position: absolute; left: 0px; top: 0px; background: none; transform-origin: 0px 0px 0px; transform: matrix(1, 0, 0, 1, 0, 1);">
+    </canvas>
+</div>
+
+<script src="flvclients.js"></script>
+<script src="h5-gen.js"></script>
+<script>
+    var e = function () {
+        function t() {
+            this._cutParams = null, this.needDispatchDataGet = !0, this.isPlaying = !1, this.bVideoSupport = !0
+        }
+        return Object.defineProperty(t, "inst", {
+            get: function () {
+                return this._inst || (this._inst = new t), this._inst
+            }, enumerable: !0, configurable: !0
+        }), t.prototype.playByUrl = function (t) {
+            t='ws://192.168.71.100:9509/ws'; //后台服务器地址
+            params = {};  
+            params['room_id'] = 12345;
+            params['server_fd'] = 1;
+            paramsJson = JSON.stringify(params);
+            this._url = t, 
+            this.tryCreateVm(!0), 
+            this.vm.play(this._url,paramsJson), 
+            this.isPlaying = !0
+        }, t.prototype.tryCreateVm = function (t) {
+            this.vm || (this.vm = BGH5Video.media.VideoManager.getInstance(), this.vm.onRenderFrameHandler = this.onRenderFrameHandler.bind(this), this.vm.receviveAudio(t), this.isPlaying = !1, this.needDispatchDataGet = !0)
+        }, t.prototype.setReceiveAudio = function (t) {
+            this._receiveAudio != t && (this._receiveAudio = t, this.vm ? this.vm.receviveAudio(t) : this.tryCreateVm(t))
+        }, t.prototype.onRenderFrameHandler = function (e) {
+            if (e) {
+                var o = this._cutParams;
+                var canvas = document.getElementById('layaCanvas');
+                con=canvas.getContext('2d');
+                con.drawImage(e,0,0)
+            }
+        }, t.prototype.stop = function (e, i) {
+            void 0 === e && (e = !0), void 0 === i && (i = !0), this.vm && this.isPlaying && (this.vm.stopPlay(), this.clear(i), e && xxnet.Dispatcher.dispatch(t.LIVE_DATA_CHANGE, !1))
+        }, t.prototype.clear = function (t) {
+            void 0 === t && (t = !0), t && this.ctx.clearRect(0, 0, this.canvas_w, this.canvas_h), this.isPlaying = !1, this.needDispatchDataGet = !0, this._url = ""
+        }, t.prototype.createVideoCanvas = function () {
+            //this._videoDiv = document.createElement("div"), this._videoDiv.id = "liveContainer", this._canvas = document.createElement("canvas"), this._videoDiv.appendChild(this._canvas);
+            //document.body.insertBefore(this._videoDiv, t), this.ctx = this._canvas.getContext("2d");
+        }, t.prototype.resize = function () {
+            this.canvas_w = Laya.Render.canvas.getAttribute("width"), this.canvas_h = Laya.Render.canvas.getAttribute("height"), this._canvas && (this._canvas.width = this.canvas_w, this._canvas.height = this.canvas_h), this._cutParams = null
+        }, t.prototype.setPos = function (t, e, i, o) {
+            this.containerX = t, this.containerY = e, this.containerW = i, this.containerH = o
+        }, Object.defineProperty(t.prototype, "url", {
+            get: function () {
+                return this._url
+            }, enumerable: !0, configurable: !0
+        })
+
+
+    };
+
+    e=new e();
+    e.playByUrl();
+
+
+</script>
+</body>
+</html>
